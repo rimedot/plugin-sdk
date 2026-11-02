@@ -1,0 +1,49 @@
+{
+  "name": "@rimedot/meva-plugin-sdk",
+  "version": "0.1.0",
+  "description": "Meva UI plugin contracts, runtime helpers, and .mevax tooling",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rimedot/plugin-sdk.git"
+  },
+  "type": "commonjs",
+  "bin": {
+    "meva-plugin": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "!dist/*.test.*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "prepare": "tsc -p tsconfig.json",
+    "lint": "eslint",
+    "test": "node --test dist/*.test.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "esbuild": "^0.27.7",
+    "fflate": "^0.8.3",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@types/node": "^25.1.0",
+    "eslint": "^9.39.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.54.0"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./manifest": "./dist/manifest.js",
+    "./protocol": "./dist/protocol.js",
+    "./runtime": "./dist/runtime.js",
+    "./processor": "./dist/processor.js",
+    "./runner": "./dist/runner.js",
+    "./source": "./dist/source.js"
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "formatVersion": 1,
+  "source": "https://github.com/rimedot/joycaption",
+  "kind": "processor",
+  "id": "github.com/rimedot/joycaption",
+  "name": "JoyCaption",
+  "version": "0.3.0",
+  "requiresMeva": ">=0.4.0",
+  "description": "Describes images and videos with JoyCaption Beta One, on this PC (llama.cpp, about 5.8 GB) or a GPU worker: a description, what it sees (people, clothing, setting, text) and tags from the description.",
+  "publisher": {
+    "name": "Meva"
+  },
+  "settings": [
+    {
+      "id": "endpoint",
+      "label": "Runs on",
+      "type": "endpoint",
+      "default": "meva:ai-worker",
+      "description": "This PC (its GPU or CPU, through llama.cpp), a paired GPU worker, or an address that serves JoyCaption."
+    },
+    {
+      "id": "model",
+      "label": "Model",
+      "type": "model",
+      "default": "joycaption-beta-one"
+    },
+    {
+      "id": "videoFrames",
+      "label": "Video frames",
+      "type": "number",
+      "default": 3,
+      "min": 1,
+      "max": 24,
+      "step": 1,
+      "description": "Frames sampled from each video; the middle one is described."
+    }
+  ],
+  "processor": {
+    "media": [
+      "image",
+      "video"
+    ],
+    "protocol": "meva-tagger",
+    "endpoint": "{endpoint}",
+    "model": "{model}",
+    "videoFrames": "{videoFrames}",
+    "writes": {
+      "aiTags": true,
+      "descriptions": true,
+      "attributes": true
+    },
+    "models": [
+      {
+        "id": "joycaption-beta-one",
+        "label": "JoyCaption Beta One",
+        "note": "Q4_K_M with its f16 projector, 5.8 GB. Needs about 6.5 GB of GPU memory, else it runs partly or fully on the CPU.",
+        "revision": "6d7fb4ddc179+acfe6bf78ae4",
+        "recipe": "llava-gguf",
+        "runtime": {
+          "name": "llama.cpp",
+          "minVersion": "b11612"
+        },
+        "files": [
+          {
+            "name": "model.gguf",
+            "url": "https://huggingface.co/mradermacher/llama-joycaption-beta-one-hf-llava-GGUF/resolve/6d7fb4ddc1796f75108239c3b6e4c5500627c820/llama-joycaption-beta-one-hf-llava.Q4_K_M.gguf",
+            "sha256": "afbf943e9f2fed20e0889146b0d3940c8a6bfc519a61daac61188cf9ef511f77",
+            "size": 4920736416
+          },
+          {
+            "name": "mmproj.gguf",
+            "url": "https://huggingface.co/concedo/llama-joycaption-beta-one-hf-llava-mmproj-gguf/resolve/acfe6bf78ae4e411cd5c7c8f4a71ba01f26a5b97/llama-joycaption-beta-one-llava-mmproj-model-f16.gguf",
+            "sha256": "94002cb5c354c7c9e538e64f37d593db9eceeca2e94573bae6cd3b2bd8bb1952",
+            "size": 877771808
+          }
+        ]
+      }
+    ],
+    "runsOn": [
+      "device",
+      "worker",
+      "address"
+    ]
+  }
+}

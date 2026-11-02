@@ -1,0 +1,171 @@
+{
+  "formatVersion": 1,
+  "source": "https://github.com/rimedot/wd-tagger",
+  "kind": "processor",
+  "id": "github.com/rimedot/wd-tagger",
+  "name": "WD Tagger",
+  "version": "0.3.0",
+  "requiresMeva": ">=0.2.0",
+  "description": "Tags images and videos with the WD tagger models (Danbooru-style tags) and rates them for safety.",
+  "publisher": {
+    "name": "Meva"
+  },
+  "settings": [
+    {
+      "id": "endpoint",
+      "label": "Tagger",
+      "type": "endpoint",
+      "default": "device",
+      "description": "Where the model runs: this device (Meva's own runtime, on the GPU when it can), a paired GPU worker, Meva's AI worker (Settings → AI), or the URL of a tagger service."
+    },
+    {
+      "id": "model",
+      "label": "Model",
+      "type": "model",
+      "default": "wd-eva02-large-tagger-v3",
+      "description": "Used on this device and by GPU workers. Download it once below."
+    },
+    {
+      "id": "threshold",
+      "label": "Minimum confidence",
+      "type": "number",
+      "default": 0.35,
+      "min": 0,
+      "max": 1,
+      "step": 0.01
+    },
+    {
+      "id": "videoFrames",
+      "label": "Video frames",
+      "type": "number",
+      "default": 3,
+      "min": 1,
+      "max": 24,
+      "step": 1,
+      "description": "Frames sampled from each video."
+    }
+  ],
+  "processor": {
+    "media": [
+      "image",
+      "video"
+    ],
+    "protocol": "meva-tagger",
+    "endpoint": "{endpoint}",
+    "model": "{model}",
+    "threshold": "{threshold}",
+    "videoFrames": "{videoFrames}",
+    "writes": {
+      "aiTags": true,
+      "classification": true
+    },
+    "adoptsLegacyTags": true,
+    "models": [
+      {
+        "id": "wd-eva02-large-tagger-v3",
+        "label": "WD EVA02 Large v3",
+        "note": "Most accurate. Needs a GPU for a large library.",
+        "revision": "b25b82a03f7282e41aa2f257a52c7583b710bd1c",
+        "recipe": "wd",
+        "files": [
+          {
+            "name": "model.onnx",
+            "url": "https://huggingface.co/SmilingWolf/wd-eva02-large-tagger-v3/resolve/b25b82a03f7282e41aa2f257a52c7583b710bd1c/model.onnx",
+            "sha256": "9e768793060c7939b277ccb382783e8670e8a042d29d77aa736be0c8cc898bfc",
+            "size": 1260435999
+          },
+          {
+            "name": "selected_tags.csv",
+            "url": "https://huggingface.co/SmilingWolf/wd-eva02-large-tagger-v3/resolve/b25b82a03f7282e41aa2f257a52c7583b710bd1c/selected_tags.csv",
+            "sha256": "298633d94d0031d2081c0893f29c82eab7f0df00b08483ba8f29d1e979441217",
+            "size": 308468
+          }
+        ]
+      },
+      {
+        "id": "wd-vit-large-tagger-v3",
+        "label": "WD ViT Large v3",
+        "note": "Close to EVA02, a little faster.",
+        "revision": "ae469aa2e4706a3af08d3673cf73a11d1add314c",
+        "recipe": "wd",
+        "files": [
+          {
+            "name": "model.onnx",
+            "url": "https://huggingface.co/SmilingWolf/wd-vit-large-tagger-v3/resolve/ae469aa2e4706a3af08d3673cf73a11d1add314c/model.onnx",
+            "sha256": "e4c8001b000a6c98f2db10794f7c406daa79873d071d6ca924330fa053fa1845",
+            "size": 1260645673
+          },
+          {
+            "name": "selected_tags.csv",
+            "url": "https://huggingface.co/SmilingWolf/wd-vit-large-tagger-v3/resolve/ae469aa2e4706a3af08d3673cf73a11d1add314c/selected_tags.csv",
+            "sha256": "298633d94d0031d2081c0893f29c82eab7f0df00b08483ba8f29d1e979441217",
+            "size": 308468
+          }
+        ]
+      },
+      {
+        "id": "wd-swinv2-tagger-v3",
+        "label": "WD SwinV2 v3",
+        "note": "Good balance of speed and accuracy.",
+        "revision": "627aef95638667ddcaa3ac8ae625e88ea5b02f51",
+        "recipe": "wd",
+        "files": [
+          {
+            "name": "model.onnx",
+            "url": "https://huggingface.co/SmilingWolf/wd-swinv2-tagger-v3/resolve/627aef95638667ddcaa3ac8ae625e88ea5b02f51/model.onnx",
+            "sha256": "e6774bff34d43bd49f75a47db4ef217dce701c9847b546523eb85ff6dbba1db1",
+            "size": 467460978
+          },
+          {
+            "name": "selected_tags.csv",
+            "url": "https://huggingface.co/SmilingWolf/wd-swinv2-tagger-v3/resolve/627aef95638667ddcaa3ac8ae625e88ea5b02f51/selected_tags.csv",
+            "sha256": "298633d94d0031d2081c0893f29c82eab7f0df00b08483ba8f29d1e979441217",
+            "size": 308468
+          }
+        ]
+      },
+      {
+        "id": "wd-convnext-tagger-v3",
+        "label": "WD ConvNeXt v3",
+        "note": "Fast; a slightly different tag balance.",
+        "revision": "d39e46de298d27340111b64965e20b8185c407e6",
+        "recipe": "wd",
+        "files": [
+          {
+            "name": "model.onnx",
+            "url": "https://huggingface.co/SmilingWolf/wd-convnext-tagger-v3/resolve/d39e46de298d27340111b64965e20b8185c407e6/model.onnx",
+            "sha256": "1b8a7abf13d9b8368267df47501d523789c4aeae66b2296ad98483239dfa32eb",
+            "size": 394990732
+          },
+          {
+            "name": "selected_tags.csv",
+            "url": "https://huggingface.co/SmilingWolf/wd-convnext-tagger-v3/resolve/d39e46de298d27340111b64965e20b8185c407e6/selected_tags.csv",
+            "sha256": "298633d94d0031d2081c0893f29c82eab7f0df00b08483ba8f29d1e979441217",
+            "size": 308468
+          }
+        ]
+      },
+      {
+        "id": "wd-vit-tagger-v3",
+        "label": "WD ViT v3",
+        "note": "Smallest and fastest; fine on a CPU.",
+        "revision": "7f6b584d0bd3f55c4531f14ba3d4761b2bccdc0f",
+        "recipe": "wd",
+        "files": [
+          {
+            "name": "model.onnx",
+            "url": "https://huggingface.co/SmilingWolf/wd-vit-tagger-v3/resolve/7f6b584d0bd3f55c4531f14ba3d4761b2bccdc0f/model.onnx",
+            "sha256": "35f23693620b668f4d53fd3c62bf65e40af739bc52c7eb0fbc49258b58d065b6",
+            "size": 378536310
+          },
+          {
+            "name": "selected_tags.csv",
+            "url": "https://huggingface.co/SmilingWolf/wd-vit-tagger-v3/resolve/7f6b584d0bd3f55c4531f14ba3d4761b2bccdc0f/selected_tags.csv",
+            "sha256": "298633d94d0031d2081c0893f29c82eab7f0df00b08483ba8f29d1e979441217",
+            "size": 308468
+          }
+        ]
+      }
+    ]
+  }
+}
