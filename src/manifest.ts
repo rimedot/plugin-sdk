@@ -4,7 +4,7 @@ import { isPluginId, sourceIdentityProblem } from "./source.js"
 export const PLUGIN_FORMAT_VERSION = 1 as const
 /** The plugin API version that `requiresMeva` is checked against. It is not
  * the Meva app version: it changes only when the plugin API breaks. */
-export const MEVA_PLUGIN_API_VERSION = "0.5.0"
+export const MEVA_PLUGIN_API_VERSION = "0.6.0"
 /** @deprecated Use MEVA_PLUGIN_API_VERSION. */
 export const MEVA_PLUGIN_COMPATIBILITY_VERSION = MEVA_PLUGIN_API_VERSION
 

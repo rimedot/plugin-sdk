@@ -6,10 +6,12 @@ import { createArchive, validateArchiveEntries } from "./zip.js"
 import { assertPluginSource, pluginManifestSchema } from "./manifest.js"
 import { isProcessorManifest, processorManifestSchema } from "./processor.js"
 import { isRunnerManifest, runnerManifestSchema } from "./runner.js"
+import { isSourceManifest, SOURCE_BUNDLE_GLOBAL, sourceManifestSchema } from "./source-plugin.js"
 
 const usage = () => {
   console.error("Usage: meva-plugin build --entry plugin.ts --manifest manifest.json --out plugin.mevax")
   console.error("       meva-plugin build --manifest manifest.json --out plugin.mevax [--readme README.md]  (processor and runner plugins)")
+  console.error("       meva-plugin build --entry source.ts --manifest manifest.json --out plugin.mevax [--readme README.md]  (source plugins)")
   console.error("       meva-plugin validate plugin.mevax")
   process.exitCode = 2
 }
@@ -21,6 +23,7 @@ const option = (args: string[], name: string) => {
 
 const PROCESSOR_ENTRIES = ["manifest.json", "plugin.js", "icon.svg", "LICENSE", "README.md"]
 const RUNNER_ENTRIES = ["manifest.json", "icon.svg", "LICENSE", "README.md"]
+const SOURCE_ENTRIES = ["manifest.json", "plugin.js", "icon.svg", "LICENSE", "README.md"]
 
 const validate = (bytes: Uint8Array): { id: string; version: string; requiresMeva: string } => {
   const entries = validateArchiveEntries(bytes)
@@ -32,6 +35,11 @@ const validate = (bytes: Uint8Array): { id: string; version: string; requiresMev
     const processor = processorManifestSchema.parse(raw)
     assertPluginSource(processor)
     return processor
+  }
+  if (isSourceManifest(raw)) {
+    for (const name of names) if (!SOURCE_ENTRIES.includes(name)) throw new Error(`Unexpected archive entry: ${name}`)
+    if (!names.has("plugin.js")) throw new Error("Missing plugin.js")
+    return sourceManifestSchema.parse(raw)
   }
   if (isRunnerManifest(raw)) {
     // The program is a separate release file per platform, never in the archive.
@@ -81,6 +89,27 @@ const main = async () => {
     return
   }
   if (!entry) return usage()
+  if (isSourceManifest(raw)) {
+    // One classic script for a Web Worker: the entry's default export is
+    // the plugin (`defineSource`), left in a global Meva's worker reads.
+    const manifest = sourceManifestSchema.parse(raw)
+    const bundled = await build({ entryPoints: [entry], bundle: true, format: "iife", globalName: SOURCE_BUNDLE_GLOBAL, platform: "browser", target: "es2022", write: false, sourcemap: false })
+    const entries: Record<string, Uint8Array | string> = {
+      "manifest.json": `${JSON.stringify(manifest, null, 2)}\n`,
+      "plugin.js": bundled.outputFiles[0]!.text,
+    }
+    const icon = option(args, "--icon")
+    const license = option(args, "--license")
+    const readme = option(args, "--readme")
+    if (icon) entries["icon.svg"] = await readFile(icon)
+    if (license) entries.LICENSE = await readFile(license)
+    if (readme) entries["README.md"] = await readFile(readme)
+    const archive = createArchive(entries)
+    validate(archive)
+    await writeFile(out, archive)
+    console.log(`Built ${out}`)
+    return
+  }
   const manifest = pluginManifestSchema.parse(raw)
   assertPluginSource(manifest)
   const tempEntry = path.join(path.dirname(entry), `.mevax-entry-${Date.now()}.ts`)

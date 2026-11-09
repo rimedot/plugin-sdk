@@ -3,6 +3,7 @@ export * from "./processor.js"
 export * from "./protocol.js"
 export * from "./runner.js"
 export * from "./source.js"
+export * from "./source-plugin.js"
 export * from "./runtime.js"
 export * from "./zip.js"
 

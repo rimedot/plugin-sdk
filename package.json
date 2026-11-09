@@ -1,6 +1,6 @@
 {
   "name": "@rimedot/meva-plugin-sdk",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Meva UI plugin contracts, runtime helpers, and .mevax tooling",
   "license": "MIT",
   "repository": {
@@ -44,6 +44,7 @@
     "./runtime": "./dist/runtime.js",
     "./processor": "./dist/processor.js",
     "./runner": "./dist/runner.js",
-    "./source": "./dist/source.js"
+    "./source": "./dist/source.js",
+    "./source-plugin": "./dist/source-plugin.js"
   }
 }

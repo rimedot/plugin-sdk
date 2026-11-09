@@ -3,17 +3,19 @@
 Types, validators, a small runtime and the `meva-plugin` command for
 building [Meva](https://github.com/rimedot) plugins as `.mevax` files.
 
-Meva has three kinds of plugins:
+Meva has four kinds of plugins:
 
 | Kind | Runs | What it is |
 |---|---|---|
 | UI | in the desktop app | A TypeScript entrypoint bundled into `plugin.js`, plus a manifest that declares its views and permissions |
 | Processor | on the Meva server | Only a manifest: how to send media to a model and what to write back (tags, ratings, descriptions) |
 | Runner | as its own program | A manifest that lists a native build per platform, each a separate release file |
+| Source | in a Web Worker in each Meva app | A site in the Sources page: a TypeScript entrypoint bundled into `plugin.js` that browses and imports through the Meva server |
 
 Example plugins: [Cat Printer](https://github.com/rimedot/cat-printer) (UI),
 [WD Tagger](https://github.com/rimedot/wd-tagger) (processor),
-[Meva runner](https://github.com/rimedot/runner) (runner).
+[Meva runner](https://github.com/rimedot/runner) (runner),
+[Booru](https://github.com/rimedot/booru) (source).
 
 ## Install
 
@@ -22,7 +24,7 @@ The SDK is not on npm. Depend on a tagged version from GitHub:
 ```json
 {
   "dependencies": {
-    "@rimedot/meva-plugin-sdk": "github:rimedot/plugin-sdk#v0.1.0"
+    "@rimedot/meva-plugin-sdk": "github:rimedot/plugin-sdk#v0.2.0"
   }
 }
 ```
@@ -119,6 +121,26 @@ that the user sees. Meva draws the controls. What the plugin can ask for:
 
 Closing the workspace revokes the media and Bluetooth grants.
 
+## A source plugin
+
+A source plugin is a site in Meva's Sources page. Its entrypoint's default
+export is the plugin (`defineSource` from `@rimedot/meva-plugin-sdk/source-plugin`):
+`feed` is required; `post`, `importPost`, `importArtist`, `resolveUrl`,
+`autocomplete`, `sites`, `artistPreviews` and `favorites` are optional and
+go with the `browse.capabilities` in the manifest.
+
+The code runs in a Web Worker with no network access of its own. Every
+request goes through `host.fetch`, which the Meva server sends only to the
+hosts in `network.hosts` (local or private addresses only when listed in
+`network.local` and accepted by the user). `host.storage` keeps the plugin's
+own files on the server, and `host.settings` holds the values of the
+manifest's `settings`. Imports return a plan of files to download with
+their sidecar fields; the server does the downloads.
+
+`network.mediaProxy` lists hosts whose images only load with a certain
+`Referer`; Meva serves those through signed links. `urlPatterns` are the
+pages the browser extension and pasted links send to the plugin.
+
 ## Build and check
 
 ```sh
@@ -128,7 +150,8 @@ meva-plugin validate my-plugin.mevax
 
 `build` bundles the entrypoint and its browser-safe dependencies into one
 `plugin.js` with esbuild. A UI `.mevax` may hold only `manifest.json`,
-`plugin.js`, `icon.svg` and `LICENSE`.
+`plugin.js`, `icon.svg` and `LICENSE`. A source plugin is built the same
+way, as one classic script for a Web Worker, and may also hold `README.md`.
 
 Processor and runner plugins have no code:
 
